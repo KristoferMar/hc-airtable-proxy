@@ -1,9 +1,9 @@
 // src/handler.js
-// Remove dotenv import — Netlify injects env vars automatically
 
 const express = require("express");
 const serverless = require("serverless-http");
 const Airtable = require("airtable");
+const router = express.Router();
 
 const base = new Airtable({
   apiKey: process.env.AIRTABLE_API_KEY
@@ -11,7 +11,7 @@ const base = new Airtable({
 
 const app = express();
 
-app.get("/get-records", async (req, res) => {
+router.get("/get-records", async (req, res) => {
   try {
     const records = [];
     await base(process.env.AIRTABLE_TABLE_NAME)
@@ -27,5 +27,7 @@ app.get("/get-records", async (req, res) => {
     res.status(500).json({ error: "Failed to fetch Airtable records" });
   }
 });
+
+app.use("/.netlify/functions/airtable", router);
 
 module.exports.handler = serverless(app);
