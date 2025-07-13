@@ -20,7 +20,8 @@ router.get("/get-records", async (req, res) => {
         partial.forEach(r => records.push(r.fields));
         fetchNextPage();
       });
-
+      
+    res.set("Access-Control-Allow-Origin", "*");
     res.json({ data: records });
   } catch (err) {
     console.error(err);
