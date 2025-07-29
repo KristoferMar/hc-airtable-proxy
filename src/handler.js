@@ -25,13 +25,11 @@ app.use((req, res, next) => {
 // Route
 router.get("/get-records", async (req, res) => {
   try {
-    const records = [];
-    await base(process.env.AIRTABLE_TABLE_NAME)
+    const airtableRecords = await base(process.env.AIRTABLE_TABLE_NAME)
       .select({ maxRecords: 10 })
-      .eachPage((partial, fetchNextPage) => {
-        partial.forEach(r => records.push(r.fields));
-        fetchNextPage();
-      });
+      .all();
+
+    const records = airtableRecords.map(r => r.fields);
 
     res.json({ data: records });
   } catch (err) {
@@ -39,6 +37,7 @@ router.get("/get-records", async (req, res) => {
     res.status(500).json({ error: "Failed to fetch Airtable records" });
   }
 });
+
 
 app.use("/.netlify/functions/airtable", router);
 
