@@ -11,6 +11,18 @@ const base = new Airtable({
 
 const app = express();
 
+// ✅ Global CORS middleware
+app.use((req, res, next) => {
+  res.setHeader("Access-Control-Allow-Origin", "https://stotmedhjerte.dk");
+  res.setHeader("Access-Control-Allow-Methods", "GET, POST, OPTIONS");
+  res.setHeader("Access-Control-Allow-Headers", "Content-Type");
+  if (req.method === "OPTIONS") {
+    return res.status(200).end();
+  }
+  next();
+});
+
+// Route
 router.get("/get-records", async (req, res) => {
   try {
     const records = [];
@@ -20,8 +32,7 @@ router.get("/get-records", async (req, res) => {
         partial.forEach(r => records.push(r.fields));
         fetchNextPage();
       });
-      
-    res.set("Access-Control-Allow-Origin", "*");
+
     res.json({ data: records });
   } catch (err) {
     console.error(err);
